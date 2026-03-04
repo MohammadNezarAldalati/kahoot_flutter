@@ -59,7 +59,7 @@ select
     "order" => 4,
     choices => array[
       '{"body": "102", "is_correct": false}'::json,
-      '{"body": "254, "is_correct": false}'::json,
+      '{"body": "254", "is_correct": false}'::json,
       '{"body": "95", "is_correct": true}'::json,
       '{"body": "67", "is_correct": false}'::json
     ]
@@ -157,6 +157,6 @@ select
       '{"body": "Playing Video Games", "is_correct": false}'::json,
       '{"body": "Doing Homework", "is_correct": false}'::json,
       '{"body": "Cleaning My Room", "is_correct": false}'::json,
-      '{"body": "Attending Lone Star Fellowship"", "is_correct": true}'::json
+      '{"body": "Attending Lone Star Fellowship", "is_correct": true}'::json
     ]
   );
