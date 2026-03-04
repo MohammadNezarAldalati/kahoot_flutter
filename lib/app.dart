@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rwg_brainhub/constants.dart';
 import 'core/theme.dart';
 import 'router.dart';
 
@@ -8,7 +9,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'SupaQuiz',
+      title: appName,
       theme: appTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

@@ -15,3 +15,8 @@ const List<Color> kAnswerColors = [
   kAnswerYellow,
   kAnswerGreen,
 ];
+
+const appName = String.fromEnvironment(
+  'APP_NAME',
+  defaultValue: 'APP_NAME',
+);
