@@ -13,16 +13,17 @@ class HostDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authAsync = ref.watch(currentUserIdProvider);
-    final quizSetsAsync = ref.watch(quizSetsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text(appName)),
       body: authAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Auth error: $e')),
-        data: (_) => quizSetsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
+        data: (_) {
+          final quizSetsAsync = ref.watch(quizSetsProvider);
+          return quizSetsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -35,45 +36,46 @@ class HostDashboardScreen extends ConsumerWidget {
                 ],
               ),
             ),
-          data: (quizSets) {
-            if (quizSets.isEmpty) {
-              return const Center(
-                child: Text('No quiz sets found. Add some in Supabase!'),
-              );
-            }
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: quizSets.length,
-                  itemBuilder: (context, index) {
-                    final quizSet = quizSets[index];
-                    return QuizSetCard(
-                      quizSet: quizSet,
-                      onStartGame: () async {
-                        try {
-                          final gameId = await ref
-                              .read(hostGameControllerProvider.notifier)
-                              .createGame(quizSet.id);
-                          if (context.mounted) {
-                            context.go('/host/game/$gameId');
+            data: (quizSets) {
+              if (quizSets.isEmpty) {
+                return const Center(
+                  child: Text('No quiz sets found. Add some in Supabase!'),
+                );
+              }
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: quizSets.length,
+                    itemBuilder: (context, index) {
+                      final quizSet = quizSets[index];
+                      return QuizSetCard(
+                        quizSet: quizSet,
+                        onStartGame: () async {
+                          try {
+                            final gameId = await ref
+                                .read(hostGameControllerProvider.notifier)
+                                .createGame(quizSet.id);
+                            if (context.mounted) {
+                              context.go('/host/game/$gameId');
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')),
+                              );
+                            }
                           }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
-                            );
-                          }
-                        }
-                      },
-                    );
-                  },
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            },
+          );
+        },
       ),
     );
   }
