@@ -22,6 +22,7 @@ class HostQuestionView extends ConsumerStatefulWidget {
 class _HostQuestionViewState extends ConsumerState<HostQuestionView> {
   bool _hasShownChoices = false;
   bool _timerExpired = false;
+
   // Track the question sequence to reset state on question change
   int _lastQuestionSequence = -1;
 
@@ -46,7 +47,7 @@ class _HostQuestionViewState extends ConsumerState<HostQuestionView> {
   void _onTimerExpired() {
     if (mounted && !game.isAnswerRevealed) {
       setState(() => _timerExpired = true);
-      ref.read(hostGameControllerProvider.notifier).revealAnswer(game.id);
+      ref.read(hostGameControllerProvider(game.id).notifier).revealAnswer();
     }
   }
 
@@ -76,8 +77,7 @@ class _HostQuestionViewState extends ConsumerState<HostQuestionView> {
 
   Widget _buildQuestionView(Question question, int totalQuestions) {
     final answersAsync = ref.watch(answersStreamProvider(question.id));
-    final participantsAsync =
-        ref.watch(participantsStreamProvider(game.id));
+    final participantsAsync = ref.watch(participantsStreamProvider(game.id));
 
     final answerCount = answersAsync.value?.length ?? 0;
     final participantCount = participantsAsync.value?.length ?? 0;
@@ -89,7 +89,7 @@ class _HostQuestionViewState extends ConsumerState<HostQuestionView> {
         !game.isAnswerRevealed &&
         !_timerExpired) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(hostGameControllerProvider.notifier).revealAnswer(game.id);
+        ref.read(hostGameControllerProvider(game.id).notifier).revealAnswer();
       });
     }
 
@@ -111,15 +111,13 @@ class _HostQuestionViewState extends ConsumerState<HostQuestionView> {
                   if (!game.isAnswerRevealed)
                     if (!_hasShownChoices)
                       CountdownTimerWidget(
-                        key: ValueKey(
-                            'reveal-${game.currentQuestionSequence}'),
+                        key: ValueKey('reveal-${game.currentQuestionSequence}'),
                         durationMs: kTimeTilChoiceReveal,
                         onComplete: _onChoiceRevealComplete,
                       )
                     else
                       CountdownTimerWidget(
-                        key: ValueKey(
-                            'answer-${game.currentQuestionSequence}'),
+                        key: ValueKey('answer-${game.currentQuestionSequence}'),
                         durationMs: kQuestionAnswerTime,
                         onComplete: _onTimerExpired,
                       ),
@@ -166,9 +164,8 @@ class _HostQuestionViewState extends ConsumerState<HostQuestionView> {
                 ElevatedButton.icon(
                   onPressed: () {
                     ref
-                        .read(hostGameControllerProvider.notifier)
+                        .read(hostGameControllerProvider(game.id).notifier)
                         .nextQuestion(
-                          game.id,
                           game.currentQuestionSequence + 1,
                           totalQuestions,
                         );

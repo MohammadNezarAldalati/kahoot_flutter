@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:rwg_brainhub/constants.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/quiz_providers.dart';
-import '../../../providers/game_providers.dart';
 import '../widgets/quiz_set_card.dart';
 
 class HostDashboardScreen extends ConsumerWidget {
@@ -49,26 +47,7 @@ class HostDashboardScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(16),
                     itemCount: quizSets.length,
                     itemBuilder: (context, index) {
-                      final quizSet = quizSets[index];
-                      return QuizSetCard(
-                        quizSet: quizSet,
-                        onStartGame: () async {
-                          try {
-                            final gameId = await ref
-                                .read(hostGameControllerProvider.notifier)
-                                .createGame(quizSet.id);
-                            if (context.mounted) {
-                              context.go('/host/game/$gameId');
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
-                          }
-                        },
-                      );
+                      return QuizSetCard(quizSet: quizSets[index]);
                     },
                   ),
                 ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/supabase_client.dart';
 import '../models/game.dart';
@@ -7,38 +9,27 @@ final gameRepositoryProvider = Provider<GameRepository>((ref) {
   return GameRepository(ref.watch(supabaseClientProvider));
 });
 
-final gameStreamProvider =
-    StreamProvider.family<Game, String>((ref, gameId) {
+final gameStreamProvider = StreamProvider.family<Game, String>((ref, gameId) {
   return ref.watch(gameRepositoryProvider).watchGame(gameId);
 });
 
-class HostGameController extends Notifier<AsyncValue<void>> {
+class HostGameController extends AsyncNotifier<void> {
+  HostGameController(this.gameId);
+
+  final String gameId;
+
   @override
-  AsyncValue<void> build() => const AsyncValue.data(null);
+  void build() {}
 
-  Future<String> createGame(String quizSetId) async {
-    state = const AsyncValue.loading();
-    try {
-      final game =
-          await ref.read(gameRepositoryProvider).createGame(quizSetId);
-      state = const AsyncValue.data(null);
-      return game.id;
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
-    }
-  }
-
-  Future<void> startGame(String gameId) async {
+  Future<void> startGame() async {
     await ref.read(gameRepositoryProvider).updatePhase(gameId, 'quiz');
   }
 
-  Future<void> revealAnswer(String gameId) async {
+  Future<void> revealAnswer() async {
     await ref.read(gameRepositoryProvider).revealAnswer(gameId);
   }
 
-  Future<void> nextQuestion(
-      String gameId, int nextSequence, int totalQuestions) async {
+  Future<void> nextQuestion(int nextSequence, int totalQuestions) async {
     if (nextSequence >= totalQuestions) {
       await ref.read(gameRepositoryProvider).updatePhase(gameId, 'result');
     } else {
@@ -47,6 +38,24 @@ class HostGameController extends Notifier<AsyncValue<void>> {
   }
 }
 
-final hostGameControllerProvider =
-    NotifierProvider<HostGameController, AsyncValue<void>>(
-        HostGameController.new);
+class GameInitializationController extends AsyncNotifier<String?> {
+  GameInitializationController(this.quizSetId);
+
+  final String quizSetId;
+
+  void create() async {
+    final game = await ref.read(gameRepositoryProvider).createGame(quizSetId);
+    state = AsyncData(game.id);
+  }
+
+  @override
+  Future<String?> build() async => null;
+}
+
+final hostGameControllerProvider = AsyncNotifierProvider.family
+    .autoDispose<HostGameController, void, String>(HostGameController.new);
+
+final initGameControllerProvider = AsyncNotifierProvider.family
+    .autoDispose<GameInitializationController, String?, String>(
+      GameInitializationController.new,
+    );

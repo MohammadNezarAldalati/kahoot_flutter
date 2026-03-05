@@ -45,10 +45,12 @@ class HostLobbyView extends ConsumerWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: participants
-                      .map((p) => Chip(
-                            avatar: const Icon(Icons.person, size: 18),
-                            label: Text(p.nickname),
-                          ))
+                      .map(
+                        (p) => Chip(
+                          avatar: const Icon(Icons.person, size: 18),
+                          label: Text(p.nickname),
+                        ),
+                      )
                       .toList(),
                 );
               },
@@ -61,8 +63,8 @@ class HostLobbyView extends ConsumerWidget {
                 onPressed: participants.isEmpty
                     ? null
                     : () => ref
-                        .read(hostGameControllerProvider.notifier)
-                        .startGame(gameId),
+                          .read(hostGameControllerProvider(gameId).notifier)
+                          .startGame(),
                 icon: const Icon(Icons.play_arrow),
                 label: const Text('Start Quiz'),
               ),
