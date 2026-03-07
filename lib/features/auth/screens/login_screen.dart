@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rwg_brainhub/constants.dart';
+import 'package:web/web.dart' as web;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,20 +12,49 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+const _emailsStorageKey = 'saved_login_emails';
+
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
+  final _emailFocusNode = FocusNode();
   final _passwordController = TextEditingController();
   bool _loading = false;
   String? _error;
   bool _showPassword = false;
   bool _magicLinkSent = false;
   int _remainingAttempts = 3;
+  List<String> _savedEmails = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _savedEmails = _loadEmails();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _emailFocusNode.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  List<String> _loadEmails() {
+    final stored = web.window.localStorage.getItem(_emailsStorageKey);
+    if (stored == null) return [];
+    return (jsonDecode(stored) as List).cast<String>();
+  }
+
+  void _saveEmail(String email) {
+    if (email.isEmpty) return;
+    final emails = _loadEmails();
+    emails.remove(email);
+    emails.insert(0, email);
+    web.window.localStorage.setItem(
+      _emailsStorageKey,
+      jsonEncode(emails),
+    );
+    setState(() => _savedEmails = emails);
   }
 
   Future<void> _onContinue() async {
@@ -37,6 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final result = await Supabase.instance.client
           .rpc('check_login_type', params: {'p_email': email});
+
+      _saveEmail(email);
 
       if (result['type'] == 'password') {
         setState(() => _showPassword = true);
@@ -158,14 +192,57 @@ class _LoginScreenState extends State<LoginScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
-        TextField(
-          controller: _emailController,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.emailAddress,
-          onSubmitted: (_) => _onContinue(),
+        RawAutocomplete<String>(
+          textEditingController: _emailController,
+          focusNode: _emailFocusNode,
+          optionsBuilder: (textEditingValue) {
+            if (textEditingValue.text.isEmpty) return _savedEmails;
+            return _savedEmails.where((email) => email
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase()));
+          },
+          onSelected: (email) {
+            _emailController.text = email;
+          },
+          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              onSubmitted: (_) {
+                onFieldSubmitted();
+                _onContinue();
+              },
+            );
+          },
+          optionsViewBuilder: (context, onSelected, options) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                elevation: 4,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 200, maxWidth: 400),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      final email = options.elementAt(index);
+                      return ListTile(
+                        leading: const Icon(Icons.history),
+                        title: Text(email),
+                        onTap: () => onSelected(email),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
         ),
         if (_error != null) ...[
           const SizedBox(height: 8),
