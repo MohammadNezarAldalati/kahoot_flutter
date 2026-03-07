@@ -21,7 +21,9 @@ class HostLobbyView extends ConsumerWidget {
           children: [
             Text(
               'Waiting for players',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 24),
             QrCodeDisplay(gameId: gameId),
@@ -42,12 +44,23 @@ class HostLobbyView extends ConsumerWidget {
                   );
                 }
                 return Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 10,
+                  runSpacing: 10,
                   children: participants
                       .map(
                         (p) => Chip(
-                          avatar: const Icon(Icons.person, size: 18),
+                          avatar: CircleAvatar(
+                            backgroundColor: const Color(0xFF7C4DFF),
+                            radius: 14,
+                            child: Text(
+                              p.nickname[0].toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                           label: Text(p.nickname),
                         ),
                       )
