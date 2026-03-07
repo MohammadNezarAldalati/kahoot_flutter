@@ -22,4 +22,9 @@ class Participant {
       userId: json['user_id'] as String,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'nickname': nickname,
+        'game_id': gameId,
+      };
 }

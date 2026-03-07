@@ -33,4 +33,11 @@ class Question {
           [],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'quiz_set_id': quizSetId,
+        'body': body,
+        'image_url': imageUrl,
+        'order': order,
+      };
 }

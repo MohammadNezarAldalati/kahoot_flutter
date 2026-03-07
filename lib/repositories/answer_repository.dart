@@ -20,11 +20,23 @@ class AnswerRepository {
     });
   }
 
+  Future<List<Answer>> getAllAnswers() async {
+    final data = await _client
+        .from('answers')
+        .select()
+        .order('created_at', ascending: false);
+    return data.map((json) => Answer.fromJson(json)).toList();
+  }
+
   Stream<List<Answer>> watchAnswersForQuestion(String questionId) {
     return _client
         .from('answers')
         .stream(primaryKey: ['id'])
         .eq('question_id', questionId)
         .map((rows) => rows.map((r) => Answer.fromJson(r)).toList());
+  }
+
+  Future<void> deleteAnswer(String id) async {
+    await _client.from('answers').delete().eq('id', id);
   }
 }

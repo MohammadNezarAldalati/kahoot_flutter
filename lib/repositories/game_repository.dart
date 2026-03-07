@@ -21,6 +21,12 @@ class GameRepository {
     return Game.fromJson(data);
   }
 
+  Future<List<Game>> getGames() async {
+    final data =
+        await _client.from('games').select().order('created_at', ascending: false);
+    return data.map((json) => Game.fromJson(json)).toList();
+  }
+
   Stream<Game> watchGame(String gameId) {
     return _client
         .from('games')
@@ -44,5 +50,9 @@ class GameRepository {
       'current_question_sequence': nextSequence,
       'is_answer_revealed': false,
     }).eq('id', gameId);
+  }
+
+  Future<void> deleteGame(String id) async {
+    await _client.from('games').delete().eq('id', id);
   }
 }

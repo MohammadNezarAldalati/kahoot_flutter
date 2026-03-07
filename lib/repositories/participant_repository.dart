@@ -15,6 +15,14 @@ class ParticipantRepository {
     return data.map((json) => Participant.fromJson(json)).toList();
   }
 
+  Future<List<Participant>> getAllParticipants() async {
+    final data = await _client
+        .from('participants')
+        .select()
+        .order('created_at', ascending: false);
+    return data.map((json) => Participant.fromJson(json)).toList();
+  }
+
   Stream<List<Participant>> watchParticipants(String gameId) {
     return _client
         .from('participants')
@@ -41,5 +49,9 @@ class ParticipantRepository {
         .select()
         .single();
     return Participant.fromJson(data);
+  }
+
+  Future<void> deleteParticipant(String id) async {
+    await _client.from('participants').delete().eq('id', id);
   }
 }

@@ -28,4 +28,11 @@ class Game {
       hostUserId: json['host_user_id'] as String?,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'quiz_set_id': quizSetId,
+        'phase': phase,
+        'current_question_sequence': currentQuestionSequence,
+        'is_answer_revealed': isAnswerRevealed,
+      };
 }

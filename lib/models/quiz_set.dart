@@ -27,4 +27,9 @@ class QuizSet {
           [],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'description': description,
+      };
 }
