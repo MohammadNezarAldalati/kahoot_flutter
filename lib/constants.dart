@@ -18,5 +18,5 @@ const List<Color> kAnswerColors = [
 
 const appName = String.fromEnvironment(
   'APP_NAME',
-  defaultValue: 'APP_NAME',
+  defaultValue: 'Kahoot Flutter',
 );
