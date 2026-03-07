@@ -1,4 +1,4 @@
-# BrainHub
+# Kahoot Flutter
 
 A real-time multiplayer quiz game built with Flutter and Supabase — think Kahoot, but open source. A host creates a game from a quiz set, players join via a link or QR code, and everyone answers questions in real time with live leaderboards.
 
