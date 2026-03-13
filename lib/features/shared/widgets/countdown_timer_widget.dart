@@ -69,8 +69,16 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
     super.dispose();
   }
 
+  Color _timerColor() {
+    if (_secondsLeft <= 5) return const Color(0xFFFF1744);
+    if (_progress < 0.4) return const Color(0xFFFFAB00);
+    return const Color(0xFF00E5FF);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final color = _timerColor();
+
     return SizedBox(
       width: 80,
       height: 80,
@@ -80,18 +88,18 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
           CircularProgressIndicator(
             value: _progress,
             strokeWidth: 6,
-            backgroundColor: Colors.white24,
-            valueColor: AlwaysStoppedAnimation(
-              _secondsLeft <= 5 ? Colors.red : Colors.white,
-            ),
+            strokeCap: StrokeCap.round,
+            backgroundColor: Colors.white12,
+            valueColor: AlwaysStoppedAnimation(color),
           ),
           Center(
             child: Text(
               '$_secondsLeft',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: _secondsLeft <= 5 ? Colors.red : null,
-                  ),
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
           ),
         ],

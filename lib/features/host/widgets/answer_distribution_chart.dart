@@ -85,7 +85,7 @@ class AnswerDistributionChart extends StatelessWidget {
                   color: kAnswerColors[i % kAnswerColors.length],
                   width: 40,
                   borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(4)),
+                      const BorderRadius.vertical(top: Radius.circular(12)),
                 ),
               ],
             );
