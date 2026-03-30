@@ -21,18 +21,26 @@ class LeaderboardWidget extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: isTop3
-                ? BorderSide(color: _podiumColor(rank).withValues(alpha: 0.5), width: 2)
+                ? BorderSide(
+                    color: _podiumColor(rank).withValues(alpha: 0.5),
+                    width: 2,
+                  )
                 : BorderSide.none,
           ),
           elevation: isTop3 ? 8 : 2,
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: isTop3 ? Colors.white24 : const Color(0xFF7C4DFF).withValues(alpha: 0.3),
+              backgroundColor: isTop3
+                  ? Colors.white24
+                  : const Color(0xFF7C4DFF).withValues(alpha: 0.3),
               child: isTop3
-                  ? Icon(_trophyIcon(rank), color: Colors.white, size: 24)
+                  ? Icon(_trophyIcon(rank), color: textColor(rank), size: 24)
                   : Text(
                       '$rank',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
             ),
             title: Text(
@@ -40,6 +48,7 @@ class LeaderboardWidget extends StatelessWidget {
               style: TextStyle(
                 fontWeight: isTop3 ? FontWeight.bold : FontWeight.normal,
                 fontSize: isTop3 ? 20 : 16,
+                color: textColor(rank)
               ),
             ),
             trailing: Container(
@@ -53,7 +62,7 @@ class LeaderboardWidget extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: isTop3 ? 20 : 16,
-                  color: Colors.white,
+                  color: textColor(rank),
                 ),
               ),
             ),
@@ -78,6 +87,13 @@ class LeaderboardWidget extends StatelessWidget {
       2 => const Color(0xFFB0BEC5), // Silver
       3 => const Color(0xFFFF8A65), // Bronze
       _ => Colors.transparent,
+    };
+  }
+
+  Color textColor(int rank) {
+    return switch (rank) {
+      1 => Colors.grey, // Gold
+      _ => Colors.white,
     };
   }
 }

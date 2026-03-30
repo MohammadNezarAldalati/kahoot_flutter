@@ -7,6 +7,14 @@ class GameRepository {
   GameRepository(this._client);
 
   Future<Game> createGame(String quizSetId) async {
+    // Delete old finished games for this quiz set so stale answers don't
+    // leak into the new game (answers query filters by questionId only).
+    await _client
+        .from('games')
+        .delete()
+        .eq('quiz_set_id', quizSetId)
+        .eq('phase', 'result');
+
     final data = await _client
         .from('games')
         .insert({'quiz_set_id': quizSetId})
