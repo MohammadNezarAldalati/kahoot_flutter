@@ -81,7 +81,7 @@ class _HostResultsViewState extends ConsumerState<HostResultsView> {
           child: ConfettiWidget(
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
+            shouldLoop: true,
             colors: const [
               Colors.red,
               Colors.blue,
@@ -89,6 +89,7 @@ class _HostResultsViewState extends ConsumerState<HostResultsView> {
               Colors.yellow,
               Colors.purple,
               Colors.orange,
+              Colors.pink,
             ],
           ),
         ),
